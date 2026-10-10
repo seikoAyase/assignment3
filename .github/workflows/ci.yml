@@ -1,0 +1,52 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    name: Lint, Test, and Verify on Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - name: Check out repository source
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black
+          pip install -e .
+
+      - name: Lint with flake8 and format check with black
+        run: |
+          # Stop build if there are Python syntax errors or undefined names
+          flake8 src/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Exit-zero treats all errors as warnings
+          flake8 src/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+          # Check code formatting style
+          black --check src/ tests/
+
+      - name: Execute automated unit test suite
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Verify CLI demo execution
+        run: |
+          python -m ptbxl_ecg.cli demo --output-dir artifacts/ci_plots --duration 5.0
+          ls -la artifacts/ci_plots/

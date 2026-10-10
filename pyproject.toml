@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ptbxl-ecg"
+version = "1.0.0"
+authors = [
+    { name = "Zhanbolat Baxen", email = "z.baxen@university.edu.kz" }
+]
+description = "PTB-XL 12-Lead ECG Preprocessing, DSP Pipeline, and PyTorch DataLoader"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Medical Science Apps."
+]
+dependencies = [
+    "numpy>=1.23.0",
+    "scipy>=1.9.0",
+    "pandas>=1.5.0",
+    "matplotlib>=3.6.0"
+]
+
+[project.optional-dependencies]
+ml = [
+    "torch>=2.0.0",
+    "wfdb>=4.1.0",
+    "scikit-learn>=1.2.0"
+]
+dev = [
+    "pytest>=7.0.0",
+    "flake8>=6.0.0",
+    "black>=23.0.0"
+]
+
+[project.scripts]
+ptbxl-ecg = "ptbxl_ecg.cli:main"
